@@ -28,7 +28,7 @@
     "segmentio/extend": "*",
     "component/indexof": "*",
     "javve/events": "*",
-    "javve/get-by-class": "*",
+    "bolero-02-everything/get-by-class": "*",
     "javve/get-attribute": "*",
     "javve/natural-sort": "*",
     "javve/to-string": "*",

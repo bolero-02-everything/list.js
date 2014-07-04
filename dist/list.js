@@ -523,7 +523,7 @@ exports.unbind = function(el, type, fn, capture){
 };
 
 });
-require.register("javve-get-by-class/index.js", function(exports, require, module){
+require.register("bolero-02-everything-get-by-class/index.js", function(exports, require, module){
 /**
  * Find all elements with class `className` inside `container`.
  * Use `single = true` to increase performance in older browsers
@@ -536,46 +536,53 @@ require.register("javve-get-by-class/index.js", function(exports, require, modul
  */
 
 module.exports = (function() {
-  if (document.getElementsByClassName) {
-    return function(container, className, single) {
-      if (single) {
-        return container.getElementsByClassName(className)[0];
-      } else {
-        return container.getElementsByClassName(className);
-      }
-    };
-  } else if (document.querySelector) {
-    return function(container, className, single) {
-      className = '.' + className;
-      if (single) {
-        return container.querySelector(className);
-      } else {
-        return container.querySelectorAll(className);
-      }
-    };
-  } else {
-    return function(container, className, single) {
-      var classElements = [],
-        tag = '*';
-      if (container == null) {
-        container = document;
-      }
-      var els = container.getElementsByTagName(tag);
-      var elsLen = els.length;
-      var pattern = new RegExp("(^|\\s)"+className+"(\\s|$)");
-      for (var i = 0, j = 0; i < elsLen; i++) {
-        if ( pattern.test(els[i].className) ) {
-          if (single) {
-            return els[i];
-          } else {
-            classElements[j] = els[i];
-            j++;
-          }
-        }
-      }
-      return classElements;
-    };
-  }
+
+	var $ = jQuery;
+	return function(container, clazz, single) {
+		var ret = $(container).find('.' + clazz).get();
+		return single ? ret[0] : ret;
+	};
+
+//  if (document.getElementsByClassName) {
+//    return function(container, className, single) {
+//      if (single) {
+//        return container.getElementsByClassName(className)[0];
+//      } else {
+//        return container.getElementsByClassName(className);
+//      }
+//    };
+//  } else if (document.querySelector) {
+//    return function(container, className, single) {
+//      className = '.' + className;
+//      if (single) {
+//        return container.querySelector(className);
+//      } else {
+//        return container.querySelectorAll(className);
+//      }
+//    };
+//  } else {
+//    return function(container, className, single) {
+//      var classElements = [],
+//        tag = '*';
+//      if (container == null) {
+//        container = document;
+//      }
+//      var els = container.getElementsByTagName(tag);
+//      var elsLen = els.length;
+//      var pattern = new RegExp("(^|\\s)"+className+"(\\s|$)");
+//      for (var i = 0, j = 0; i < elsLen; i++) {
+//        if ( pattern.test(els[i].className) ) {
+//          if (single) {
+//            return els[i];
+//          } else {
+//            classElements[j] = els[i];
+//            j++;
+//          }
+//        }
+//      }
+//      return classElements;
+//    };
+//  }
 })();
 
 });
@@ -702,7 +709,11 @@ module.exports = function(val){
   if (val !== val) return 'nan';
   if (val && val.nodeType === 1) return 'element';
 
-  return typeof val.valueOf();
+  val = val.valueOf
+    ? val.valueOf()
+    : Object.prototype.valueOf.apply(val)
+
+  return typeof val;
 };
 
 });
@@ -1450,8 +1461,8 @@ require.alias("component-event/index.js", "javve-events/deps/event/index.js");
 
 require.alias("timoxley-to-array/index.js", "javve-events/deps/to-array/index.js");
 
-require.alias("javve-get-by-class/index.js", "list.js/deps/get-by-class/index.js");
-require.alias("javve-get-by-class/index.js", "get-by-class/index.js");
+require.alias("bolero-02-everything-get-by-class/index.js", "list.js/deps/get-by-class/index.js");
+require.alias("bolero-02-everything-get-by-class/index.js", "get-by-class/index.js");
 
 require.alias("javve-get-attribute/index.js", "list.js/deps/get-attribute/index.js");
 require.alias("javve-get-attribute/index.js", "get-attribute/index.js");
@@ -1468,7 +1479,7 @@ require.alias("component-type/index.js", "type/index.js");
 if (typeof exports == "object") {
   module.exports = require("list.js");
 } else if (typeof define == "function" && define.amd) {
-  define(function(){ return require("list.js"); });
+  define([], function(){ return require("list.js"); });
 } else {
   this["List"] = require("list.js");
 }})();
