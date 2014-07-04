@@ -39,16 +39,21 @@ var Templater = function(list) {
     /* Sets values at element */
     this.set = function(item, values) {
         if (!templater.create(item)) {
+	          var fm = false;
+	          if(list.itemCellFormatter) {
+		          fm = list.itemCellFormatter;
+	          }
             for(var v in values) {
                 if (values.hasOwnProperty(v)) {
                     // TODO speed up if possible
                     var elm = getByClass(item.elm, v, true);
                     if (elm) {
+	                      var val = fm ? fm(v, value[v]) : value[v];
                         /* src attribute for image tag & text for other tags */
-                        if (elm.tagName === "IMG" && values[v] !== "") {
-                            elm.src = values[v];
+                        if (elm.tagName === "IMG" && val !== "") {
+                            elm.src = val;
                         } else {
-                            elm.innerHTML = values[v];
+                            elm.innerHTML = val;
                         }
                     }
                 }
