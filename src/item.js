@@ -8,6 +8,8 @@ module.exports = function (list) {
 		this.filtered = false;// Show if list.filtered == true and this.filtered == true
 
 		var init = function (initValues, element, notCreate) {
+			item.listIndex = -1;
+			item.visibleListIndex = -1;
 			if (element === undefined) {
 				if (notCreate) {
 					item.values(initValues, notCreate);
