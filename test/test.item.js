@@ -142,6 +142,23 @@ describe('Item', function () {
 				expect(item.visible()).to.be(true);
 			});
 		});
+		describe('Index at list or visible list', function() {
+			it('default', function() {
+				expect(item).equal(list.items[item.listIndex]);
+			});
+			it('visible', function() {
+				expect(item).equal(list.visibleItems[item.listVisibleIndex]);
+			});
+			it('invisible', function(){
+				list.filter(function(){return false;});
+				expect(item).equal(list.items[item.listIndex]);
+				expect(item.listVisibleIndex).to.be(-1);
+
+				list.filter(function(){return true;});
+				expect(item.listVisibleIndex).to.be(0);
+				expect(item).equal(list.visibleItems[item.listVisibleIndex]);
+			});
+		});
 	});
 
 	fixture.removeList();
