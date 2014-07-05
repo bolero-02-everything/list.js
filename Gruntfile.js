@@ -1,6 +1,8 @@
 module.exports = function (grunt) {
 	"use strict";
 
+	require('load-grunt-tasks')(grunt);
+
 	grunt.initConfig({
 		pkg: require("./package.json"),
 		watch: {
@@ -11,6 +13,15 @@ module.exports = function (grunt) {
 					spawn: false,
 				},
 			},
+		},
+		connect: {
+			mocha: {
+				options: {
+					hostname: 'localhost',
+					port: 8123,
+					base: './'
+				}
+			}
 		},
 		shell: {
 			install: {
