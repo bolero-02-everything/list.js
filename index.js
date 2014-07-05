@@ -170,10 +170,10 @@
 			return self;
 		};
 
-		this.trigger = function (event) {
+		this.trigger = function (event, opt) {
 			var i = self.handlers[event].length;
 			while (i--) {
-				self.handlers[event][i](self);
+				self.handlers[event][i](self, opt);
 			}
 			return self;
 		};
