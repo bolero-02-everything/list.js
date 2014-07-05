@@ -204,12 +204,18 @@
 			self.visibleItems = [];
 			self.matchingItems = [];
 			self.templater.clear();
+			var visibleIndex = 0;
 			for (var i = 0; i < il; i++) {
-				if (is[i].matching() && ((self.matchingItems.length + 1) >= self.i && self.visibleItems.length < self.page)) {
+				var isMatch = is[i].matching();
+				var isVisible = isMatch && ((self.matchingItems.length + 1) >= self.i && self.visibleItems.length < self.page);
+				is[i].listIndex = i;
+				is[i].listVisibleIndex = -1;
+				if (isMatch && isVisible) {
+					is[i].listVisibleIndex = visibleIndex++;
 					is[i].show();
 					self.visibleItems.push(is[i]);
 					self.matchingItems.push(is[i]);
-				} else if (is[i].matching()) {
+				} else if (isMatch) {
 					self.matchingItems.push(is[i]);
 					is[i].hide();
 				} else {
