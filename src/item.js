@@ -36,6 +36,7 @@ module.exports = function (list) {
 		};
 		this.show = function () {
 			list.templater.show(item);
+			list.trigger('itemShow', item);
 		};
 		this.hide = function () {
 			list.templater.hide(item);

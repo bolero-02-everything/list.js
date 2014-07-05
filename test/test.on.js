@@ -120,4 +120,17 @@ describe('On', function () {
 			});
 		});
 	});
+
+	describe('Item', function() {
+		it('should be triggered before item be showed', function (done) {
+			var count = 0;
+			var len = list.items.length;
+			list.on('itemShow', function (list, item) {
+				if(++count === len) {
+					done();
+				}
+			});
+			list.filter(function(){return true;});
+		});
+	});
 });

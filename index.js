@@ -30,7 +30,7 @@
 				self.matchingItems = [];
 				self.searched = false;
 				self.filtered = false;
-				self.handlers = { 'updated': [] };
+				self.handlers = { 'updated': [], 'itemShow' : [] };
 				self.plugins = {};
 				self.helpers = {
 					getByClass: getByClass,
