@@ -19,8 +19,8 @@
 <!-- this specific version is needed for grunt-mocha (wtf...) -->
 
 <script>
+	jQuery = $ = require('jquery');
 	List = require('list.js');
-	$ = require('jquery');
 
 	if (navigator.userAgent.indexOf('PhantomJS') < 0) {
 		// This version is needed to not get "Out of stack space" error in IE
