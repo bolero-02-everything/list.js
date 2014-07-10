@@ -52,6 +52,9 @@ module.exports = function (list) {
 		this.visible = function () {
 			return (item.elm.parentNode == list.list) ? true : false;
 		};
+		this.el = function() {
+			return this.elem;
+		};
 		init(initValues, element, notCreate);
 	};
 };
