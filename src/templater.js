@@ -4,6 +4,10 @@ var Templater = function (list) {
 	var itemSource = getItemSource(list.item),
 		templater = this;
 
+	var itemElementCreator = list.itemElementCreator || false;
+	var itemValuesSetter = list.itemValuesSetter || false;
+	var itemValuesGetter = list.itemValuesGetter || false;
+
 	function getItemSource(item) {
 		if (item === undefined) {
 			var nodes = list.list.childNodes,
@@ -28,32 +32,36 @@ var Templater = function (list) {
 	/* Get values from element */
 	this.get = function (item, valueNames) {
 		templater.create(item);
-		var values = {};
-		for (var i = 0, il = valueNames.length; i < il; i++) {
-			var elm = getByClass(item.elm, valueNames[i], true);
-			values[valueNames[i]] = elm ? elm.innerHTML : "";
+		if (!!!itemValuesGetter) {
+			return itemValuesGetter(item, valueNames);
+		} else {
+			var values = {};
+			for (var i = 0, il = valueNames.length; i < il; i++) {
+				var elm = getByClass(item.elm, valueNames[i], true);
+				values[valueNames[i]] = elm ? elm.innerHTML : "";
+			}
+			return values;
 		}
-		return values;
 	};
 
 	/* Sets values at element */
 	this.set = function (item, values) {
 		if (!templater.create(item)) {
-			var fm = false;
-			if (list.itemCellFormatter) {
-				fm = list.itemCellFormatter;
-			}
-			for (var v in values) {
-				if (values.hasOwnProperty(v)) {
-					// TODO speed up if possible
-					var elm = getByClass(item.elm, v, true);
-					if (elm) {
-						var val = fm ? fm(v, values[v]) : values[v];
-						/* src attribute for image tag & text for other tags */
-						if (elm.tagName === "IMG" && val !== "") {
-							elm.src = val;
-						} else {
-							elm.innerHTML = val;
+			if (!!!itemValuesSetter) {
+				itemValuesSetter(item, values);
+			} else {
+				for (var v in values) {
+					if (values.hasOwnProperty(v)) {
+						// TODO speed up if possible
+						var elm = getByClass(item.elm, v, true);
+						if (elm) {
+							var val = values[v];
+							/* src attribute for image tag & text for other tags */
+							if (elm.tagName === "IMG" && val !== "") {
+								elm.src = val;
+							} else {
+								elm.innerHTML = val;
+							}
 						}
 					}
 				}
@@ -67,8 +75,15 @@ var Templater = function (list) {
 		}
 		/* If item source does not exists, use the first item in list as
 		 source for new items */
-		var newItem = itemSource.cloneNode(true);
-		newItem.removeAttribute('id');
+
+		var newItem;
+		if (!!!itemElementCreator) {
+			newItem == itemElementCreator(item);
+		} else {
+			newItem = itemSource.cloneNode(true);
+			newItem.removeAttribute('id');
+		}
+
 		item.elm = newItem;
 		templater.set(item, item.values());
 		return true;
