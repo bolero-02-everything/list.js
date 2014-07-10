@@ -53,7 +53,7 @@ module.exports = function (list) {
 			return (item.elm.parentNode == list.list) ? true : false;
 		};
 		this.el = function() {
-			return this.elem;
+			return this.elm;
 		};
 		init(initValues, element, notCreate);
 	};

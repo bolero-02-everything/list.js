@@ -159,6 +159,11 @@ describe('Item', function () {
 				expect(item).equal(list.visibleItems[item.listVisibleIndex]);
 			});
 		});
+		describe('el() should be able to access item element', function() {
+			it('default', function() {
+				expect(item.el()).to.have.property('innerHTML');
+			});
+		});
 	});
 
 	fixture.removeList();

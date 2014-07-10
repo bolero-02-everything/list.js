@@ -32,7 +32,7 @@ var Templater = function (list) {
 	/* Get values from element */
 	this.get = function (item, valueNames) {
 		templater.create(item);
-		if (!!!itemValuesGetter) {
+		if (!!itemValuesGetter) {
 			return itemValuesGetter(item, valueNames);
 		} else {
 			var values = {};
@@ -47,7 +47,7 @@ var Templater = function (list) {
 	/* Sets values at element */
 	this.set = function (item, values) {
 		if (!templater.create(item)) {
-			if (!!!itemValuesSetter) {
+			if (!!itemValuesSetter) {
 				itemValuesSetter(item, values);
 			} else {
 				for (var v in values) {
@@ -77,7 +77,7 @@ var Templater = function (list) {
 		 source for new items */
 
 		var newItem;
-		if (!!!itemElementCreator) {
+		if (!!itemElementCreator) {
 			newItem == itemElementCreator(item);
 		} else {
 			newItem = itemSource.cloneNode(true);
