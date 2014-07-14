@@ -78,7 +78,7 @@ var Templater = function (list) {
 
 		var newItem;
 		if (!!itemElementCreator) {
-			newItem == itemElementCreator(item);
+			newItem = itemElementCreator(item);
 		} else {
 			newItem = itemSource.cloneNode(true);
 			newItem.removeAttribute('id');
