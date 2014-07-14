@@ -1,9 +1,10 @@
 var fixture = {
-	list: function (valueNames, items) {
+	list: function (valueNames, items, opts) {
 		var listHtml = $('<div id="list"><ul class="list"></ul></div>'),
 			item = "";
 
 		item = "<li>";
+		valueNames = valueNames || ['name', 'born'];
 		for (var i = 0; i < valueNames.length; i++) {
 			item += '<span class="' + valueNames[i] + '"</span>';
 		}
@@ -11,12 +12,10 @@ var fixture = {
 
 		$(document.body).append(listHtml);
 
-		items = items || [];
+//		items = items || [];
+		items = items || fixture.all;
 
-		return new List('list', {
-			valueNames: valueNames,
-			item: item
-		}, items);
+		return new List('list', $.extend({valueNames: valueNames, item: item}, opts), items);
 	},
 	removeList: function () {
 		$('#list').remove();

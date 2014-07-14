@@ -164,6 +164,43 @@ describe('Item', function () {
 				expect(item.el()).to.have.property('innerHTML');
 			});
 		});
+		describe('custom element creator/getter/setter', function() {
+			it('default', function() {
+				fixture.removeList();
+				var myList = fixture.list(null, null, {
+					itemElementCreator: function(it) {
+						var el = document.createElement('li');
+						var $el = $(el).addClass('test-creator');
+						$el.html('<input class="name" /><span class="born"></span>');
+						return el;
+					},
+					itemValuesSetter: function(it, values) {
+						var $el = $(it.el());
+						$el.find('.name').val(values.name);
+						$el.find('.born').text(values.born);
+					},
+					itemValuesGetter: function(it, valueNames) {
+						//TODO
+					}
+				});
+				for(var i = 0, il = myList.items.length; i < il; ++i) {
+					var it = myList.items[i];
+					var $el = $(it.el());
+					var values = it.values();
+
+					expect($el.prop('tagName')).to.be('LI');
+					expect($el.hasClass('test-creator')).to.be(true);
+
+					var $name = $el.find('.name');
+					expect($name.prop('tagName')).to.be('INPUT');
+					expect($name.val()).to.be(values.name);
+
+					var $born = $el.find('.born');
+					expect($born.prop('tagName')).to.be('SPAN');
+					expect($born.text()).to.be(values.born);
+				}
+			});
+		});
 	});
 
 	fixture.removeList();
