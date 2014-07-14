@@ -73,8 +73,10 @@ var Templater = function (list) {
 		if (item.elm !== undefined) {
 			return false;
 		}
-		/* If item source does not exists, use the first item in list as
-		 source for new items */
+		/*
+			If item source does not exists,
+			use the first item in list as source for new items
+		*/
 
 		var newItem;
 		if (typeof itemElementCreator === 'function') {
