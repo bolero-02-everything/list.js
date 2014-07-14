@@ -1235,6 +1235,9 @@ module.exports = function (list) {
 		this.visible = function () {
 			return (item.elm.parentNode == list.list) ? true : false;
 		};
+		this.el = function() {
+			return this.elm;
+		};
 		init(initValues, element, notCreate);
 	};
 };
@@ -1243,104 +1246,120 @@ module.exports = function (list) {
 require.register("list.js/src/templater.js", function(exports, require, module){
 var getByClass = require('get-by-class');
 
-var Templater = function(list) {
-    var itemSource = getItemSource(list.item),
-        templater = this;
+var Templater = function (list) {
+	var itemSource = getItemSource(list.item),
+		templater = this;
 
-    function getItemSource(item) {
-        if (item === undefined) {
-            var nodes = list.list.childNodes,
-                items = [];
+	var itemElementCreator = list.itemElementCreator || false;
+	var itemValuesSetter = list.itemValuesSetter || false;
+	var itemValuesGetter = list.itemValuesGetter || false;
 
-            for (var i = 0, il = nodes.length; i < il; i++) {
-                // Only textnodes have a data attribute
-                if (nodes[i].data === undefined) {
-                    return nodes[i];
-                }
-            }
-            return null;
-        } else if (item.indexOf("<") !== -1) { // Try create html element of list, do not work for tables!!
-            var div = document.createElement('div');
-            div.innerHTML = item;
-            return div.firstChild;
-        } else {
-            return document.getElementById(list.item);
-        }
-    }
+	function getItemSource(item) {
+		if (item === undefined) {
+			var nodes = list.list.childNodes,
+				items = [];
 
-    /* Get values from element */
-    this.get = function(item, valueNames) {
-        templater.create(item);
-        var values = {};
-        for(var i = 0, il = valueNames.length; i < il; i++) {
-            var elm = getByClass(item.elm, valueNames[i], true);
-            values[valueNames[i]] = elm ? elm.innerHTML : "";
-        }
-        return values;
-    };
+			for (var i = 0, il = nodes.length; i < il; i++) {
+				// Only textnodes have a data attribute
+				if (nodes[i].data === undefined) {
+					return nodes[i];
+				}
+			}
+			return null;
+		} else if (item.indexOf("<") !== -1) { // Try create html element of list, do not work for tables!!
+			var div = document.createElement('div');
+			div.innerHTML = item;
+			return div.firstChild;
+		} else {
+			return document.getElementById(list.item);
+		}
+	}
 
-    /* Sets values at element */
-    this.set = function(item, values) {
-        if (!templater.create(item)) {
-              var fm = false;
-              if(list.itemCellFormatter) {
-									fm = list.itemCellFormatter;
-              }
-            for(var v in values) {
-                if (values.hasOwnProperty(v)) {
-                    // TODO speed up if possible
-                    var elm = getByClass(item.elm, v, true);
-                    if (elm) {
-												var val = fm ? fm(v, values[v]) : values[v];
-                        /* src attribute for image tag & text for other tags */
-                        if (elm.tagName === "IMG" && val !== "") {
-                            elm.src = val;
-                        } else {
-                            elm.innerHTML = val;
-                        }
-                    }
-                }
-            }
-        }
-    };
+	/* Get values from element */
+	this.get = function (item, valueNames) {
+		templater.create(item);
+		if (typeof itemValuesGetter === 'function') {
+			return itemValuesGetter(item, valueNames);
+		} else {
+			var values = {};
+			for (var i = 0, il = valueNames.length; i < il; i++) {
+				var elm = getByClass(item.elm, valueNames[i], true);
+				values[valueNames[i]] = elm ? elm.innerHTML : "";
+			}
+			return values;
+		}
+	};
 
-    this.create = function(item) {
-        if (item.elm !== undefined) {
-            return false;
-        }
-        /* If item source does not exists, use the first item in list as
-        source for new items */
-        var newItem = itemSource.cloneNode(true);
-        newItem.removeAttribute('id');
-        item.elm = newItem;
-        templater.set(item, item.values());
-        return true;
-    };
-    this.remove = function(item) {
-        list.list.removeChild(item.elm);
-    };
-    this.show = function(item) {
-        templater.create(item);
-        list.list.appendChild(item.elm);
-    };
-    this.hide = function(item) {
-        if (item.elm !== undefined && item.elm.parentNode === list.list) {
-            list.list.removeChild(item.elm);
-        }
-    };
-    this.clear = function() {
-        /* .innerHTML = ''; fucks up IE */
-        if (list.list.hasChildNodes()) {
-            while (list.list.childNodes.length >= 1)
-            {
-                list.list.removeChild(list.list.firstChild);
-            }
-        }
-    };
+	/* Sets values at element */
+	this.set = function (item, values) {
+		if (!templater.create(item)) {
+			if (typeof itemValuesSetter === 'function') {
+				itemValuesSetter(item, values);
+			} else {
+				for (var v in values) {
+					if (values.hasOwnProperty(v)) {
+						// TODO speed up if possible
+						var elm = getByClass(item.elm, v, true);
+						if (elm) {
+							var val = values[v];
+							/* src attribute for image tag & text for other tags */
+							if (elm.tagName === "IMG" && val !== "") {
+								elm.src = val;
+							} else {
+								elm.innerHTML = val;
+							}
+						}
+					}
+				}
+			}
+		}
+	};
+
+	this.create = function (item) {
+		if (item.elm !== undefined) {
+			return false;
+		}
+		/*
+			If item source does not exists,
+			use the first item in list as source for new items
+		*/
+
+		var newItem;
+		if (typeof itemElementCreator === 'function') {
+			newItem = itemElementCreator(item);
+		} else {
+			newItem = itemSource.cloneNode(true);
+			newItem.removeAttribute('id');
+		}
+
+		item.elm = newItem;
+		templater.set(item, item.values());
+		return true;
+	};
+	this.remove = function (item) {
+		list.list.removeChild(item.elm);
+	};
+	this.show = function (item) {
+		templater.create(item);
+		list.list.appendChild(item.elm);
+	};
+	this.hide = function (item) {
+		if (item.elm !== undefined && item.elm.parentNode === list.list) {
+			list.list.removeChild(item.elm);
+		}
+	};
+	this.clear = function () {
+		/* .innerHTML = ''; fucks up IE */
+		if (list.list.hasChildNodes()) {
+			while (list.list.childNodes.length >= 1) {
+				list.list.removeChild(list.list.firstChild);
+			}
+		}
+	};
 };
 
-module.exports = function(list) {
-    return new Templater(list);
+module.exports = function (list) {
+	return new Templater(list);
 };
 
 });
